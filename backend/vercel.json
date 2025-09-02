@@ -15,6 +15,7 @@
   ],
   "env": {
     "NODE_ENV": "production",
+    "ADMIN_TOKEN": "Agathe0211/",
     "VERCEL": "1"
   }
 }
