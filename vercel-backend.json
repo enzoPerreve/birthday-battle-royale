@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "name": "birthday-battle-backend",
+  "builds": [
+    {
+      "src": "backend/app.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/app.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/backend/app.js"
+    }
+  ],
+  "functions": {
+    "backend/app.js": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "ADMIN_TOKEN": "@admin-token",
+    "FIREBASE_API_KEY": "@firebase-api-key",
+    "FIREBASE_AUTH_DOMAIN": "@firebase-auth-domain",
+    "FIREBASE_PROJECT_ID": "@firebase-project-id",
+    "FIREBASE_STORAGE_BUCKET": "@firebase-storage-bucket",
+    "FIREBASE_MESSAGING_SENDER_ID": "@firebase-messaging-sender-id",
+    "FIREBASE_APP_ID": "@firebase-app-id",
+    "EMAIL_USER": "@email-user",
+    "EMAIL_PASS": "@email-pass"
+  }
+}
