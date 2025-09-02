@@ -8,6 +8,7 @@ import Games from './pages/Games';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
 import DebugAPI from './pages/DebugAPI';
+import APITester from './pages/APITester';
 import './styles/App.css';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/debug" element={<DebugAPI />} />
+          <Route path="/api-test" element={<APITester />} />
         </Routes>
       </Router>
       
