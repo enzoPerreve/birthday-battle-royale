@@ -36,11 +36,6 @@ const Games = () => {
     }
   };
 
-  const handleJoinGame = async (gameId) => {
-    // Removed - Admin only feature
-    toast.info('Game participation is managed by the admin');
-  };
-
   const getGameIcon = (type) => {
     switch(type) {
       case 'quiz': return '🧠';
