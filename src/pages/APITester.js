@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './DebugAPI.css';
+import './APITester.css';
 
 const APITester = () => {
   const [results, setResults] = useState({});
