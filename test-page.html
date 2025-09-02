@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Battle Royale - Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0A1A2F;
+            color: #F2F2F2;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .title {
+            color: #FFD700;
+            font-size: 32px;
+            text-shadow: 2px 2px 0px #FF2D2D;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #F2F2F2;
+            font-size: 18px;
+        }
+        .section {
+            background-color: #1A2A4F;
+            border: 3px solid #FFD700;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #FFD700;
+            margin-top: 0;
+        }
+        .btn {
+            background-color: #D62828;
+            color: #F2F2F2;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #FF2D2D;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #FFD700;
+            background-color: #0A1A2F;
+            color: #F2F2F2;
+            border-radius: 5px;
+        }
+        .result {
+            background-color: #0A1A2F;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            border-color: #00FF00;
+            color: #00FF00;
+        }
+        .error {
+            border-color: #FF2D2D;
+            color: #FF2D2D;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🎮 BIRTHDAY BATTLE ROYALE 🎮</h1>
+            <p class="subtitle">Page de Test API - Testez toutes les fonctionnalités !</p>
+        </div>
+
+        <div class="grid">
+            <!-- Test API Health -->
+            <div class="section">
+                <h2>🔍 Test API Health</h2>
+                <button class="btn" onclick="testHealth()">Tester l'API</button>
+                <div id="healthResult" class="result"></div>
+            </div>
+
+            <!-- Register User -->
+            <div class="section">
+                <h2>👤 Inscription Utilisateur</h2>
+                <div class="form-group">
+                    <label for="userName">Nom :</label>
+                    <input type="text" id="userName" placeholder="Nom du warrior">
+                </div>
+                <div class="form-group">
+                    <label for="userContact">Contact :</label>
+                    <input type="email" id="userContact" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="userPhrase">Phrase de combat :</label>
+                    <input type="text" id="userPhrase" placeholder="Ready to rumble!">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="alcoholPref"> Alcool
+                    </label>
+                    <label>
+                        <input type="checkbox" id="spicyPref"> Épicé
+                    </label>
+                </div>
+                <button class="btn" onclick="registerUser()">S'inscrire</button>
+                <div id="registerResult" class="result"></div>
+            </div>
+
+            <!-- Get Participants -->
+            <div class="section">
+                <h2>👥 Liste des Participants</h2>
+                <button class="btn" onclick="getParticipants()">Charger Participants</button>
+                <div id="participantsResult" class="result"></div>
+            </div>
+
+            <!-- Admin Login -->
+            <div class="section">
+                <h2>🔐 Admin</h2>
+                <p style="color: #FFD700; font-size: 14px; margin-bottom: 15px;">
+                    💡 Token configuré: <strong>Agathe0211/</strong><br>
+                    ⚠️ Tapez le token puis cliquez "Définir Token" (pas d'activation automatique)
+                </p>
+                <div class="form-group">
+                    <label for="adminToken">Token Admin :</label>
+                    <input type="text" id="adminToken" placeholder="Saisissez: Agathe0211/" onkeydown="event.stopPropagation()" onkeyup="event.stopPropagation()" oninput="event.stopPropagation()">
+                </div>
+                <button class="btn" onclick="setAdminToken()">Définir Token</button>
+                <button class="btn" onclick="clearAdminToken()" style="background-color: #666;">Effacer Token</button>
+                <div id="adminResult" class="result">Mode Admin: INACTIF</div>
+            </div>
+
+            <!-- Generate Battle -->
+            <div class="section">
+                <h2>⚔️ Générer Battle</h2>
+                <div class="form-group">
+                    <label for="battleType">Type de Battle :</label>
+                    <select id="battleType">
+                        <option value="1v1">1v1 Duel</option>
+                        <option value="2v2">2v2 Team</option>
+                        <option value="3v3">3v3 Squad</option>
+                        <option value="free-for-all">Free-for-All</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="generateBattle()">Générer Battle</button>
+                <div id="battleResult" class="result"></div>
+            </div>
+
+            <!-- Get Battles -->
+            <div class="section">
+                <h2>🏆 Liste des Battles</h2>
+                <button class="btn" onclick="getAllBattles()">Tous les Battles</button>
+                <button class="btn" onclick="getActiveBattles()">Battles Actifs</button>
+                <div id="battlesResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let adminToken = '';
+
+        function setAdminToken() {
+            adminToken = document.getElementById('adminToken').value;
+            const resultDiv = document.getElementById('adminResult');
+            if (adminToken === 'Agathe0211/') {
+                resultDiv.textContent = 'Token Admin Activé ✅ - Mode Admin disponible';
+                resultDiv.className = 'result success';
+            } else if (adminToken) {
+                resultDiv.textContent = 'Token incorrect ❌ - Utilisez: Agathe0211/';
+                resultDiv.className = 'result error';
+                adminToken = ''; // Reset le token si incorrect
+            } else {
+                resultDiv.textContent = 'Token vide ❌';
+                resultDiv.className = 'result error';
+            }
+        }
+
+        function clearAdminToken() {
+            document.getElementById('adminToken').value = '';
+            adminToken = '';
+            document.getElementById('adminResult').textContent = 'Token effacé - Mode Admin désactivé';
+            document.getElementById('adminResult').className = 'result';
+        }
+
+        async function apiCall(url, options = {}) {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                };
+
+                if (adminToken && options.requiresAdmin) {
+                    headers['x-admin-token'] = adminToken;
+                }
+
+                const response = await fetch(API_BASE + url, {
+                    ...options,
+                    headers
+                });
+
+                const data = await response.json();
+                return { success: response.ok, data, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function testHealth() {
+            const result = await apiCall('/health');
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.textContent = JSON.stringify(result, null, 2);
+            resultDiv.className = result.success ? 'result success' : 'result error';
+        }
+
+        async function registerUser() {
+            const userData = {
+                name: document.getElementById('userName').value,
+                contact: document.getElementById('userContact').value,
+                phrase: document.getElementById('userPhrase').value || 'Ready to rumble!',
+                preferences: {
+                    alcohol: document.getElementById('alcoholPref').checked,
+                    spicy: document.getElementById('spicyPref').checked
+                }
+            };
+
+            if (!userData.name || !userData.contact) {
+                alert('Nom et contact requis !');
+                return;
+            }
+
+            const result = await apiCall('/users/register', {
+                method: 'POST',
+                body: JSON.stringify(userData)
+            });
+
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.textContent = JSON.stringify(result, null, 2);
+            resultDiv.className = result.success ? 'result success' : 'result error';
+        }
+
+        async function getParticipants() {
+            const result = await apiCall('/users/participants');
+            const resultDiv = document.getElementById('participantsResult');
+            resultDiv.textContent = JSON.stringify(result, null, 2);
+            resultDiv.className = result.success ? 'result success' : 'result error';
+        }
+
+        async function generateBattle() {
+            if (!adminToken) {
+                alert('Token admin requis !');
+                return;
+            }
+
+            const battleType = document.getElementById('battleType').value;
+            const result = await apiCall('/battles/random', {
+                method: 'POST',
+                body: JSON.stringify({ type: battleType }),
+                requiresAdmin: true
+            });
+
+            const resultDiv = document.getElementById('battleResult');
+            resultDiv.textContent = JSON.stringify(result, null, 2);
+            resultDiv.className = result.success ? 'result success' : 'result error';
+        }
+
+        async function getAllBattles() {
+            const result = await apiCall('/battles');
+            const resultDiv = document.getElementById('battlesResult');
+            resultDiv.textContent = JSON.stringify(result, null, 2);
+            resultDiv.className = result.success ? 'result success' : 'result error';
+        }
+
+        async function getActiveBattles() {
+            const result = await apiCall('/battles/active');
+            const resultDiv = document.getElementById('battlesResult');
+            resultDiv.textContent = JSON.stringify(result, null, 2);
+            resultDiv.className = result.success ? 'result success' : 'result error';
+        }
+
+        // Auto-test au chargement
+        window.onload = function() {
+            testHealth();
+            
+            // Empêcher l'activation automatique du token admin
+            document.getElementById('adminToken').addEventListener('input', function(e) {
+                e.stopPropagation();
+                // Ne pas activer automatiquement
+            });
+            
+            // Permettre l'activation seulement avec Entrée
+            document.getElementById('adminToken').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    setAdminToken();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
