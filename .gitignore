@@ -49,3 +49,6 @@ backend/uploads/
 
 # Vercel
 .vercel
+
+# Git submodules or embedded repos
+github-release/

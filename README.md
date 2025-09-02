@@ -1,13 +1,39 @@
-# Birthday Battle Royale 🎮
+# 🎮 Birthday Battle Royale
 
-An interactive web application for hosting epic birthday party battles with random participant selection, real-time notifications, and admin management.
+Une application web interactive pour organiser des batailles d'anniversaire épiques avec des quiz, jeux musicaux et défis créatifs !
 
-## 🎯 Features
+## 🌟 Fonctionnalités
 
-- **Participant Registration**: Easy registration with photo upload and preferences
-- **Random Battle Generation**: Automatic selection of participants for different battle types
-- **Real-time Dashboard**: Admin panel for managing battles and participants
-- **Notification System**: Email notifications for battle alerts
+### Pour les Participants
+- 📝 **Inscription simple** avec photo et préférences
+- 🎮 **Jeux interactifs** : Quiz, Musique, Paroles
+- 🏆 **Leaderboard** en temps réel
+- 📱 **Interface mobile** responsive
+- 🎯 **Système de points** compétitif
+
+### Pour l'Administrateur
+- 🎲 **Création de jeux** personnalisés
+- ⚔️ **Gestion des battles** (1v1, 2v2, 3v3, free-for-all)
+- 📊 **Dashboard admin** complet
+- 📢 **Notifications** aux participants
+- 🔧 **Token sécurisé** : `Agathe0211/`
+
+## 🚀 Déploiement
+
+Cette application est prête pour le déploiement sur **Vercel** avec auto-deploy depuis GitHub.
+
+### URLs de Production
+- **Frontend** : https://birthday-battle-royale.vercel.app
+- **Backend API** : https://birthday-battle-api.vercel.app
+- **Admin Panel** : https://birthday-battle-royale.vercel.app/admin
+
+### Configuration Rapide
+1. Forkez ce repository
+2. Connectez-le à Vercel
+3. Configurez les variables d'environnement
+4. Auto-deploy activé ! 🎉
+
+Voir [DEPLOYMENT.md](./DEPLOYMENT.md) pour les instructions détaillées.
 - **Responsive Design**: Works on desktop, mobile, and projection screens
 - **Retro Arcade Theme**: Pixel art styling with festive elements
 
