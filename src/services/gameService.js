@@ -4,7 +4,17 @@ export const gameService = {
   // Get active games
   async getActiveGames() {
     try {
-      const response = await api.get('/games/active');
+      const response = await api.get('/games?status=active');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch games');
+    }
+  },
+
+  // Get all games
+  async getAllGames() {
+    try {
+      const response = await api.get('/games');
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch games');
@@ -14,7 +24,7 @@ export const gameService = {
   // Get game by ID
   async getGameById(id) {
     try {
-      const response = await api.get(`/games/${id}`);
+      const response = await api.get(`/games?gameId=${id}`);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch game');
@@ -24,10 +34,22 @@ export const gameService = {
   // Join game
   async joinGame(gameId, userId) {
     try {
-      const response = await api.post(`/games/${gameId}/join`, { userId });
+      const response = await api.post('/join-game', { gameId, userId });
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to join game');
+    }
+  },
+
+  // Leave game
+  async leaveGame(gameId, userId) {
+    try {
+      const response = await api.delete('/join-game', { 
+        data: { gameId, userId }
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to leave game');
     }
   },
 
@@ -44,19 +66,29 @@ export const gameService = {
   // Get leaderboard
   async getLeaderboard() {
     try {
-      const response = await api.get('/games/leaderboard');
+      const response = await api.get('/stats');
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch leaderboard');
     }
   },
 
+  // Get game stats
+  async getGameStats(gameId) {
+    try {
+      const response = await api.get(`/stats?gameId=${gameId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch game stats');
+    }
+  },
+
   // Admin: Create game
-  async createGame(gameData, adminToken) {
+  async createGame(gameData, adminToken = 'Agathe0211/') {
     try {
       const response = await api.post('/games', gameData, {
         headers: {
-          'x-admin-token': adminToken
+          'X-Admin-Token': adminToken
         }
       });
       return response.data;
@@ -66,11 +98,14 @@ export const gameService = {
   },
 
   // Admin: Start game
-  async startGame(gameId, adminToken) {
+  async startGame(gameId, adminToken = 'Agathe0211/') {
     try {
-      const response = await api.post(`/games/${gameId}/start`, {}, {
+      const response = await api.post('/game-control', {
+        gameId,
+        action: 'start'
+      }, {
         headers: {
-          'x-admin-token': adminToken
+          'X-Admin-Token': adminToken
         }
       });
       return response.data;
@@ -80,16 +115,36 @@ export const gameService = {
   },
 
   // Admin: End game
-  async endGame(gameId, adminToken) {
+  async endGame(gameId, adminToken = 'Agathe0211/') {
     try {
-      const response = await api.post(`/games/${gameId}/end`, {}, {
+      const response = await api.post('/game-control', {
+        gameId,
+        action: 'end'
+      }, {
         headers: {
-          'x-admin-token': adminToken
+          'X-Admin-Token': adminToken
         }
       });
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to end game');
+    }
+  },
+
+  // Admin: Pause game
+  async pauseGame(gameId, adminToken = 'Agathe0211/') {
+    try {
+      const response = await api.post('/game-control', {
+        gameId,
+        action: 'pause'
+      }, {
+        headers: {
+          'X-Admin-Token': adminToken
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to pause game');
     }
   }
 };

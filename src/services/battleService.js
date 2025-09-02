@@ -1,102 +1,58 @@
 import api from './api';
 
 export const battleService = {
-  // Get all battles
-  async getAllBattles() {
+  // Get battle history for a game
+  async getBattleHistory(gameId) {
     try {
-      const response = await api.get('/battles');
+      const response = await api.get(`/battle?gameId=${gameId}`);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch battles');
+      throw new Error(error.response?.data?.message || 'Failed to fetch battle history');
     }
   },
 
-  // Get active battles
-  async getActiveBattles() {
+  // Execute battle round
+  async executeBattle(gameId, round) {
     try {
-      const response = await api.get('/battles/active');
+      const response = await api.post('/battle', { gameId, round });
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch active battles');
+      throw new Error(error.response?.data?.message || 'Failed to execute battle');
     }
   },
 
-  // Get battle by ID
-  async getBattleById(id) {
+  // Get battle stats
+  async getBattleStats(gameId) {
     try {
-      const response = await api.get(`/battles/${id}`);
+      const response = await api.get(`/stats?gameId=${gameId}`);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch battle');
+      throw new Error(error.response?.data?.message || 'Failed to fetch battle stats');
     }
   },
 
-  // Create new battle (admin only)
-  async createBattle(battleData) {
+  // Get notifications
+  async getNotifications(userId) {
     try {
-      const response = await api.post('/battles', battleData);
+      const response = await api.get(`/notifications?userId=${userId}`);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to create battle');
-    }
-  },
-
-  // Generate random battle (admin only)
-  async generateRandomBattle(type = '1v1') {
-    try {
-      const adminToken = localStorage.getItem('adminToken');
-      const response = await api.post('/battles/random', { type }, {
-        headers: {
-          'x-admin-token': adminToken
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to generate random battle');
-    }
-  },
-
-  // Update battle status (admin only)
-  async updateBattleStatus(id, status) {
-    try {
-      const adminToken = localStorage.getItem('adminToken');
-      const response = await api.put(`/battles/${id}/status`, { status }, {
-        headers: {
-          'x-admin-token': adminToken
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to update battle status');
-    }
-  },
-
-  // Set battle winner (admin only)
-  async setBattleWinner(id, winnerId) {
-    try {
-      const adminToken = localStorage.getItem('adminToken');
-      const response = await api.put(`/battles/${id}/winner`, { winnerId }, {
-        headers: {
-          'x-admin-token': adminToken
-        }
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to set battle winner');
+      throw new Error(error.response?.data?.message || 'Failed to fetch notifications');
     }
   },
 
   // Send battle notification (admin only)
   async sendBattleNotification(message, recipients, subject) {
     try {
-      const adminToken = localStorage.getItem('adminToken');
-      const response = await api.post('/battles/notify', {
+      const response = await api.post('/notifications', {
+        type: 'battle',
+        title: subject || 'Battle Notification',
         message,
-        recipients,
-        subject
+        broadcast: recipients === 'all',
+        userId: recipients !== 'all' ? recipients : null
       }, {
         headers: {
-          'x-admin-token': adminToken
+          'X-Admin-Token': 'Agathe0211/'
         }
       });
       return response.data;
