@@ -20,8 +20,19 @@ const DebugAPI = () => {
     try {
       addResult('📡 Test Health Check...');
       const response = await fetch(`/api/health`);
-      const data = await response.json();
-      addResult(`✅ Health Check: ${response.status} - ${JSON.stringify(data)}`);
+      
+      if (response.ok) {
+        try {
+          const data = await response.json();
+          addResult(`✅ Health Check: ${response.status} - ${JSON.stringify(data)}`);
+        } catch (jsonError) {
+          const text = await response.text();
+          addResult(`⚠️ Health Check: ${response.status} - Non-JSON response: ${text.substring(0, 100)}...`);
+        }
+      } else {
+        const text = await response.text();
+        addResult(`❌ Health Check: ${response.status} - ${text.substring(0, 100)}...`);
+      }
     } catch (error) {
       addResult(`❌ Health Check Error: ${error.message}`);
     }
@@ -46,15 +57,55 @@ const DebugAPI = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: 'Test User',
-          contact: 'test@example.com',
-          phrase: 'Debug test'
+          name: 'Test User Debug',
+          contact: 'test-debug@example.com',
+          phrase: 'Debug test run'
         })
       });
-      const data = await response.json();
-      addResult(`✅ POST: ${response.status} - ${JSON.stringify(data)}`);
+      
+      if (response.ok) {
+        try {
+          const data = await response.json();
+          addResult(`✅ POST: ${response.status} - ${JSON.stringify(data)}`);
+        } catch (jsonError) {
+          const text = await response.text();
+          addResult(`⚠️ POST: ${response.status} - Non-JSON response: ${text.substring(0, 100)}...`);
+        }
+      } else {
+        const text = await response.text();
+        addResult(`❌ POST: ${response.status} - ${text.substring(0, 100)}...`);
+      }
     } catch (error) {
       addResult(`❌ POST Error: ${error.message}`);
+    }
+
+    // Test 4: Admin Token
+    try {
+      addResult('🔐 Test Admin Token...');
+      const response = await fetch(`/api/admin/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: 'Agathe0211/'
+        })
+      });
+      
+      if (response.ok) {
+        try {
+          const data = await response.json();
+          addResult(`✅ Admin: ${response.status} - ${JSON.stringify(data)}`);
+        } catch (jsonError) {
+          const text = await response.text();
+          addResult(`⚠️ Admin: ${response.status} - Non-JSON response: ${text.substring(0, 100)}...`);
+        }
+      } else {
+        const text = await response.text();
+        addResult(`❌ Admin: ${response.status} - ${text.substring(0, 100)}...`);
+      }
+    } catch (error) {
+      addResult(`❌ Admin Error: ${error.message}`);
     }
 
     setLoading(false);
