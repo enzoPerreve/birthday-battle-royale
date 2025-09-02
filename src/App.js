@@ -7,6 +7,7 @@ import Participants from './pages/Participants';
 import Games from './pages/Games';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
+import DebugAPI from './pages/DebugAPI';
 import './styles/App.css';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/games" element={<Games />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/debug" element={<DebugAPI />} />
         </Routes>
       </Router>
       

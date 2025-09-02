@@ -1,21 +1,21 @@
 {
   "version": 2,
-  "name": "birthday-battle-api",
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
+      "src": "/api/health",
+      "dest": "/health.js"
+    },
+    {
+      "src": "/api/users/register",
+      "dest": "/register.js"
+    },
+    {
+      "src": "/api/admin/verify",
+      "dest": "/verify.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "api/index.js"
+      "dest": "/health.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "ADMIN_TOKEN": "Agathe0211/",
-    "VERCEL": "1"
-  }
+  ]
 }

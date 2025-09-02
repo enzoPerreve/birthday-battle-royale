@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "name": "birthday-battle-api",
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "ADMIN_TOKEN": "Agathe0211/",
+    "VERCEL": "1"
+  }
+}

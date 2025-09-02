@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Backend</title>
+</head>
+<body>
+    <h1>🔧 Test Direct de l'API Backend</h1>
+    
+    <div id="results"></div>
+    
+    <button onclick="testHealth()">Test Health Check</button>
+    <button onclick="testPost()">Test POST Registration</button>
+    <button onclick="testRoot()">Test Root</button>
+    
+    <script>
+        const API_URL = 'https://birthday-battle-977oqxmkw-enzoperreves-projects.vercel.app';
+        const resultsDiv = document.getElementById('results');
+        
+        function log(message) {
+            const p = document.createElement('p');
+            p.innerHTML = message;
+            resultsDiv.appendChild(p);
+        }
+        
+        async function testHealth() {
+            try {
+                log('🔍 Test Health Check...');
+                const response = await fetch(API_URL + '/api/health');
+                const data = await response.json();
+                log(`✅ Health Check: ${response.status} - ${JSON.stringify(data)}`);
+            } catch (error) {
+                log(`❌ Health Check Error: ${error.message}`);
+            }
+        }
+        
+        async function testPost() {
+            try {
+                log('🔍 Test POST Registration...');
+                const response = await fetch(API_URL + '/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        contact: 'test@example.com',
+                        phrase: 'Test phrase'
+                    })
+                });
+                const data = await response.json();
+                log(`✅ POST Test: ${response.status} - ${JSON.stringify(data)}`);
+            } catch (error) {
+                log(`❌ POST Error: ${error.message}`);
+            }
+        }
+        
+        async function testRoot() {
+            try {
+                log('🔍 Test Root...');
+                const response = await fetch(API_URL + '/');
+                const data = await response.json();
+                log(`✅ Root Test: ${response.status} - ${JSON.stringify(data)}`);
+            } catch (error) {
+                log(`❌ Root Error: ${error.message}`);
+            }
+        }
+        
+        // Auto-run tests
+        window.onload = function() {
+            setTimeout(testRoot, 1000);
+            setTimeout(testHealth, 2000);
+            setTimeout(testPost, 3000);
+        };
+    </script>
+</body>
+</html>

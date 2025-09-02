@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "birthday-battle-royale",
   "builds": [
     {
       "src": "package.json",
@@ -19,8 +18,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "https://birthday-battle-bp9hbkota-enzoperreves-projects.vercel.app"
-  }
+  ]
 }
