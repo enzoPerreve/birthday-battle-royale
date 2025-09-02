@@ -40,7 +40,7 @@ const DebugAPI = () => {
     // Test 2: CORS preflight
     try {
       addResult('🌐 Test CORS...');
-      const response = await fetch(`/api/users/register`, {
+      const response = await fetch(`/api/register`, {
         method: 'OPTIONS'
       });
       addResult(`✅ CORS: ${response.status}`);
@@ -51,7 +51,7 @@ const DebugAPI = () => {
     // Test 3: POST Registration
     try {
       addResult('📝 Test POST Registration...');
-      const response = await fetch(`/api/users/register`, {
+      const response = await fetch(`/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const DebugAPI = () => {
     // Test 4: Admin Token
     try {
       addResult('🔐 Test Admin Token...');
-      const response = await fetch(`/api/admin/verify`, {
+      const response = await fetch(`/api/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

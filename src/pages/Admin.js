@@ -58,15 +58,13 @@ const Admin = () => {
       // Définir temporairement le token pour la validation
       localStorage.setItem('adminToken', adminToken);
       
-      // Test simple : essayer de récupérer les battles (pas besoin d'admin)
-      // puis tester une route admin
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/battles/test-admin`, {
+      // Test d'authentification admin
+      const response = await fetch(`/api/verify`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-admin-token': adminToken
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ test: true })
+        body: JSON.stringify({ token: adminToken })
       });
       
       if (response.ok) {
