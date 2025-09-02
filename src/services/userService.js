@@ -19,7 +19,7 @@ export const userService = {
   // Get all participants
   async getParticipants() {
     try {
-      const response = await api.get('/users');
+      const response = await api.get('/register');
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch participants');

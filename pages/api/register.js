@@ -36,10 +36,47 @@ export default async function handler(req, res) {
     }
   }
 
-  // GET method
+  // GET method - Return mock users for now
+  const mockUsers = [
+    {
+      id: 'user_1',
+      name: 'Alice Martin',
+      contact: 'alice@example.com',
+      phrase: 'Prête à gagner !',
+      registeredAt: new Date(Date.now() - 86400000).toISOString(),
+      gamesPlayed: 3,
+      gamesWon: 1,
+      currentGameId: 'game_2',
+      status: 'active'
+    },
+    {
+      id: 'user_2',
+      name: 'Bob Durand',
+      contact: 'bob@example.com', 
+      phrase: 'Let\'s battle!',
+      registeredAt: new Date(Date.now() - 7200000).toISOString(),
+      gamesPlayed: 2,
+      gamesWon: 0,
+      currentGameId: null,
+      status: 'inactive'
+    },
+    {
+      id: 'user_3',
+      name: 'Charlie Moreau',
+      contact: 'charlie@example.com',
+      phrase: 'Birthday warrior!',
+      registeredAt: new Date(Date.now() - 3600000).toISOString(),
+      gamesPlayed: 1,
+      gamesWon: 1,
+      currentGameId: 'game_1',
+      status: 'active'
+    }
+  ];
+
   return res.status(200).json({
     success: true,
-    message: 'Registration endpoint is ready',
-    timestamp: new Date().toISOString()
+    message: 'Users retrieved successfully',
+    data: mockUsers,
+    total: mockUsers.length
   });
 }
