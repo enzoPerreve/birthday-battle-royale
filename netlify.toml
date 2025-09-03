@@ -1,0 +1,18 @@
+# Fichier de configuration pour Netlify
+
+[build]
+  # Commande pour construire le site. Vercel détecte `npm run build` par défaut.
+  command = "npm run build"
+  
+  # Dossier qui contient le site buildé. Pour Create React App, c'est 'build'.
+  # Pour Next.js, ce serait '.next'.
+  publish = "build"
+  
+  # Dossier où se trouvent les fonctions serverless (API).
+  functions = "api"
+
+# Redirection pour que les appels /api/* fonctionnent comme sur Vercel.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
