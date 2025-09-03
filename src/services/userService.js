@@ -16,10 +16,10 @@ export const userService = {
     }
   },
 
-  // Get all participants - using health endpoint as workaround
+  // Get all participants
   async getParticipants() {
     try {
-      const response = await api.get('/health?participants=true');
+      const response = await api.get('/users');
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch participants');
