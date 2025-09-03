@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 import Balloons from '../components/Balloons';
 import VSLogo from '../components/VSLogo';
 import Navigation from '../components/Navigation';
@@ -8,6 +9,7 @@ import { userService } from '../services/userService';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -91,9 +93,20 @@ const Register = () => {
             });
           }
         }
-        setTimeout(() => {
-          navigate('/participants');
-        }, 2000);
+
+        // Connecter automatiquement l'utilisateur après inscription
+        const userData = result.data;
+        if (userData && userData.name) {
+          login('user', userData.name, userData.id || `temp_${Date.now()}`);
+          setTimeout(() => {
+            navigate('/');
+          }, 1500);
+        } else {
+          // Fallback : rediriger vers login
+          setTimeout(() => {
+            navigate('/login');
+          }, 1500);
+        }
       }
     } catch (error) {
       console.error('Registration error:', error);
