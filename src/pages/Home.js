@@ -13,6 +13,12 @@ const Home = () => {
         <h1 className="title-main">
           BIRTHDAY BATTLE<br />ROYALE
         </h1>
+
+        <p className="invitation-text">
+          Salut à tous et bienvenue !<br />
+          Pour fêter mon anniversaire comme il se doit, je vous invite à une compétition amicale tout au long de la soirée.
+          Inscrivez-vous, participez aux jeux et que le meilleur gagne !
+        </p>
         
         <p className="subtitle">
           SCAN QR CODE TO REGISTER
@@ -89,6 +95,17 @@ const Home = () => {
           margin: 0 auto;
           padding: 20px;
           text-align: center;
+        }
+
+        .invitation-text {
+          font-family: var(--font-body);
+          font-size: 1.2rem;
+          color: #fff;
+          margin: 20px 0;
+          line-height: 1.6;
+          max-width: 600px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         .home-rules {

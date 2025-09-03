@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext'; // Importer le hook d'authentification
 import Navigation from '../components/Navigation';
 import Loading from '../components/Loading';
 import { userService } from '../services/userService';
@@ -7,17 +8,22 @@ import { battleService } from '../services/battleService';
 import { gameService } from '../services/gameService';
 
 const Admin = () => {
+  const { isAdmin, login, logout } = useAuth(); // Utiliser le contexte
   const [participants, setParticipants] = useState([]);
   const [battles, setBattles] = useState([]);
   const [activeBattle, setActiveBattle] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Initialement false
   const [adminToken, setAdminToken] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedGame, setSelectedGame] = useState('quiz');
   const [gameTitle, setGameTitle] = useState('');
   const [gameDescription, setGameDescription] = useState('');
 
-  // Plus de useEffect qui teste automatiquement le token
+  useEffect(() => {
+    // Si l'utilisateur est déjà admin (rechargement de page), charger les données
+    if (isAdmin) {
+      loadAdminData();
+    }
+  }, [isAdmin]);
 
   const loadAdminData = async () => {
     try {
@@ -55,49 +61,87 @@ const Admin = () => {
     }
     
     try {
-      // Définir temporairement le token pour la validation
-      localStorage.setItem('adminToken', adminToken);
-      
-      // Test d'authentification admin
       const response = await fetch(`/api/verify`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Admin-Token': adminToken
         },
-        body: JSON.stringify({ token: adminToken })
+        body: JSON.stringify({ token: adminToken }) // Garder pour compatibilité
       });
       
-      if (response.ok) {
-        // Token valide
-        setIsAuthenticated(true);
-        loadAdminData();
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        login(); // Mettre à jour le contexte global
         toast.success('Admin login successful!');
       } else {
-        throw new Error('Invalid token');
+        throw new Error(result.message || 'Invalid token');
       }
     } catch (error) {
       console.error('Login error:', error);
-      // Token invalide - nettoyer
-      localStorage.removeItem('adminToken');
+      logout(); // S'assurer que l'état est bien "déconnecté"
       setAdminToken('');
-      setIsAuthenticated(false);
-      toast.error('Invalid admin token');
+      toast.error(error.message || 'Invalid admin token');
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+    logout(); // Mettre à jour le contexte global
     setAdminToken('');
-    setIsAuthenticated(false);
     setParticipants([]);
     setBattles([]);
     setActiveBattle(null);
   };
 
-  const generateRandomBattle = async (type = '1v1') => {
-    try {
-      const result = await battleService.generateRandomBattle(type);
-      if (result.success) {
+  // Remplacer isAuthenticated par isAdmin partout dans le JSX
+  if (!isAdmin) {
+    return (
+      <div className="page-container">
+        <Navigation />
+        <div className="admin-login-container">
+          <h2>Admin Access</h2>
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              value={adminToken}
+              onChange={(e) => setAdminToken(e.target.value)}
+              placeholder="Enter Admin Token"
+              className="admin-token-input"
+            />
+            <button type="submit" className="btn btn-primary">Login</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <Navigation />
+        <Loading message="Loading admin dashboard..." />
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-container">
+      <Navigation />
+      <div className="admin-dashboard">
+        <header className="admin-header">
+          <h1>Admin Dashboard</h1>
+          <button onClick={handleLogout} className="btn btn-danger">Logout</button>
+        </header>
+        
+        {/* ... Reste du JSX pour le panel admin ... */}
+        
+      </div>
+    </div>
+  );
+};
+
+export default Admin;
         toast.success(`Random ${type} battle created!`);
         loadAdminData(); // Refresh data
       }
