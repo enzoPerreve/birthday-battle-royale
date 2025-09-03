@@ -1,8 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './contexts/AuthContext'; // Importer le fournisseur
+import { AuthProvider, useAuth } from './contexts/AuthContext'; // Importer le fournisseur et hook
 import Home from './pages/Home';
+import Login from './pages/Login';
 import Register from './pages/Register';
 import Participants from './pages/Participants';
 import Games from './pages/Games';
@@ -12,20 +13,91 @@ import DebugAPI from './pages/DebugAPI';
 import APITester from './pages/APITester';
 import './styles/App.css';
 
+// Composant pour protéger les routes qui nécessitent une authentification
+const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const { isAuthenticated, isAdmin } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (adminOnly && !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
+// Composant pour rediriger les utilisateurs connectés loin de login/register
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
 function App() {
   return (
     <AuthProvider> {/* Envelopper l'application avec le fournisseur */}
       <div className="App">
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/participants" element={<Participants />} />
-            <Route path="/games" element={<Games />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/debug" element={<DebugAPI />} />
-            <Route path="/api-test" element={<APITester />} />
+            {/* Routes publiques - accessibles seulement si non connecté */}
+            <Route path="/login" element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            } />
+            <Route path="/register" element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            } />
+            
+            {/* Routes protégées - nécessitent une authentification */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } />
+            <Route path="/participants" element={
+              <ProtectedRoute>
+                <Participants />
+              </ProtectedRoute>
+            } />
+            <Route path="/leaderboard" element={
+              <ProtectedRoute>
+                <Leaderboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Routes admin uniquement */}
+            <Route path="/games" element={
+              <ProtectedRoute adminOnly={true}>
+                <Games />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute adminOnly={true}>
+                <Admin />
+              </ProtectedRoute>
+            } />
+            <Route path="/debug" element={
+              <ProtectedRoute adminOnly={true}>
+                <DebugAPI />
+              </ProtectedRoute>
+            } />
+            <Route path="/api-test" element={
+              <ProtectedRoute adminOnly={true}>
+                <APITester />
+              </ProtectedRoute>
+            } />
+            
+            {/* Redirection par défaut */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
         

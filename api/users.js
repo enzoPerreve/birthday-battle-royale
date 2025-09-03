@@ -1,62 +1,26 @@
-// api/users.js - Netlify Function format
+// api/users.js - Netlify Function format with Firebase integration
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, getDocs, orderBy, query } from 'firebase/firestore';
 
-const participants = [
-      {
-        id: 'user_1',
-        name: 'Alice Martin',
-        contact: 'alice@example.com',
-        phrase: 'Prête à gagner !',
-        registeredAt: '2025-09-02T17:48:58.104Z',
-        gamesPlayed: 3,
-        gamesWon: 1,
-        currentGameId: 'game_2',
-        status: 'active'
-      },
-      {
-        id: 'user_2', 
-        name: 'Bob Durand',
-        contact: 'bob@example.com',
-        phrase: 'Let\'s battle!',
-        registeredAt: '2025-09-02T18:48:58.104Z',
-        gamesPlayed: 2,
-        gamesWon: 0,
-        currentGameId: null,
-        status: 'inactive'
-      },
-      {
-        id: 'user_3',
-        name: 'Charlie Moreau', 
-        contact: 'charlie@example.com',
-        phrase: 'Birthday warrior!',
-        registeredAt: '2025-09-02T19:48:58.104Z',
-        gamesPlayed: 1,
-        gamesWon: 1,
-        currentGameId: 'game_1',
-        status: 'active'
-      },
-      {
-        id: 'user_4',
-        name: 'Sophie Dubois',
-        contact: 'sophie@example.com', 
-        phrase: 'Ready for action!',
-        registeredAt: '2025-09-02T20:48:58.104Z',
-        gamesPlayed: 5,
-        gamesWon: 2,
-        currentGameId: 'game_1',
-        status: 'active'
-      },
-      {
-        id: 'user_5',
-        name: 'Lucas Bernard',
-        contact: 'lucas@example.com',
-        phrase: 'Game on!',
-        registeredAt: '2025-09-02T21:48:58.104Z',
-        gamesPlayed: 4,
-        gamesWon: 1,
-        currentGameId: 'game_2',
-        status: 'active'
-      }
-    ];
+// Configuration Firebase (utilise les variables d'environnement de Netlify)
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+};
+
+// Initialiser Firebase seulement si ce n'est pas déjà fait
+let app;
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0];
+}
+
+const db = getFirestore(app);
 
 export const handler = async (event, context) => {
   // CORS headers for Netlify
@@ -75,17 +39,50 @@ export const handler = async (event, context) => {
   }
 
   if (event.httpMethod === 'GET') {
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        message: 'Participants retrieved successfully',
-        data: participants,
-        total: participants.length,
-        timestamp: new Date().toISOString()
-      })
-    };
+    try {
+      // Récupérer tous les participants depuis Firestore
+      const participantsQuery = query(
+        collection(db, 'participants'), 
+        orderBy('registeredAt', 'desc')
+      );
+      
+      const querySnapshot = await getDocs(participantsQuery);
+      const participants = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        participants.push({
+          id: doc.id,
+          ...data,
+          // Convertir les timestamps Firestore en strings pour JSON
+          registeredAt: data.registeredAt?.toDate?.()?.toISOString() || data.registeredAt,
+          lastActive: data.lastActive?.toDate?.()?.toISOString() || data.lastActive
+        });
+      });
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: 'Participants retrieved successfully',
+          data: participants,
+          count: participants.length,
+          timestamp: new Date().toISOString()
+        })
+      };
+    } catch (error) {
+      console.error('Error fetching participants from Firebase:', error);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Failed to fetch participants',
+          error: error.message
+        })
+      };
+    }
   }
 
   return {

@@ -1,4 +1,6 @@
-// api/register.js - Netlify Function format
+// api/register.js - Netlify Function format with Firebase
+import { db } from '../src/config/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export const handler = async (event, context) => {
   // CORS headers
@@ -20,14 +22,29 @@ export const handler = async (event, context) => {
     try {
       const body = JSON.parse(event.body || '{}');
       const { name, contact, phrase } = body;
+
+      if (!name || !contact) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ success: false, message: 'Name and contact are required.' })
+        };
+      }
       
-      const user = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: name || 'Anonymous User',
-        contact: contact || 'unknown@example.com',
+      const newUser = {
+        name: name,
+        contact: contact,
         phrase: phrase || 'Ready to battle!',
-        registeredAt: new Date().toISOString()
+        registeredAt: serverTimestamp(), // Utilise l'heure du serveur Firebase
+        gamesPlayed: 0,
+        gamesWon: 0,
+        currentGameId: null,
+        status: 'active',
+        lastActive: serverTimestamp()
       };
+
+      // Ajoute le nouvel utilisateur à la collection "participants"
+      const docRef = await addDoc(collection(db, "participants"), newUser);
 
       return {
         statusCode: 201,
@@ -35,7 +52,7 @@ export const handler = async (event, context) => {
         body: JSON.stringify({
           success: true,
           message: 'User registered successfully!',
-          data: user
+          data: { id: docRef.id, ...newUser }
         })
       };
     } catch (error) {
@@ -45,7 +62,7 @@ export const handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: false,
-          message: 'Registration failed',
+          message: 'Registration failed due to a server error.',
           error: error.message
         })
       };
