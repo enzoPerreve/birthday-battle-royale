@@ -1,10 +1,31 @@
-// api/users.js - Netlify Function format with temporary mock data
-// Will be updated to use Firebase when Firestore is activated
+// api/users.js - Netlify Function format with Firebase integration + fallback
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, getDocs, orderBy, query } from 'firebase/firestore';
 
-// Temporary mock data for testing
-const temporaryParticipants = [
+// Configuration Firebase (utilise les variables d'environnement de Netlify)
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+};
+
+// Initialiser Firebase seulement si ce n'est pas déjà fait
+let app;
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0];
+}
+
+const db = getFirestore(app);
+
+// Données de secours si Firebase ne fonctionne pas
+const fallbackParticipants = [
   {
-    id: 'temp_user_1',
+    id: 'fallback_user_1',
     name: 'Alice Martin',
     contact: 'alice@example.com',
     phrase: 'Prête à gagner !',
@@ -15,7 +36,7 @@ const temporaryParticipants = [
     status: 'active'
   },
   {
-    id: 'temp_user_2', 
+    id: 'fallback_user_2', 
     name: 'Bob Durand',
     contact: 'bob@example.com',
     phrase: 'Let\'s battle!',
@@ -45,21 +66,57 @@ export const handler = async (event, context) => {
 
   if (event.httpMethod === 'GET') {
     try {
-      // Return temporary mock data
-      console.log('Returning temporary participants (local mode)');
+      // Essayer Firebase d'abord
+      try {
+        const participantsQuery = query(
+          collection(db, 'participants'), 
+          orderBy('registeredAt', 'desc')
+        );
+        
+        const querySnapshot = await getDocs(participantsQuery);
+        const participants = [];
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          message: 'Participants retrieved successfully (temporary local mode)',
-          data: temporaryParticipants,
-          count: temporaryParticipants.length,
-          timestamp: new Date().toISOString(),
-          note: 'Using mock data - Firebase Firestore will be connected soon'
-        })
-      };
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          participants.push({
+            id: doc.id,
+            ...data,
+            // Convertir les timestamps Firestore en strings pour JSON
+            registeredAt: data.registeredAt?.toDate?.()?.toISOString() || data.registeredAt,
+            lastActive: data.lastActive?.toDate?.()?.toISOString() || data.lastActive
+          });
+        });
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: 'Participants retrieved successfully from Firebase!',
+            data: participants,
+            count: participants.length,
+            timestamp: new Date().toISOString(),
+            firebaseConnected: true
+          })
+        };
+      } catch (firebaseError) {
+        console.log('Firebase error, using fallback data:', firebaseError.message);
+        
+        // Mode fallback avec données temporaires
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: 'Participants retrieved successfully (fallback mode)',
+            data: fallbackParticipants,
+            count: fallbackParticipants.length,
+            timestamp: new Date().toISOString(),
+            firebaseConnected: false,
+            note: 'Using fallback data - Firebase will be retried next time'
+          })
+        };
+      }
     } catch (error) {
       console.error('Error fetching participants:', error);
       return {

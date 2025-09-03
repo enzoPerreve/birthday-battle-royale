@@ -74,19 +74,23 @@ const Register = () => {
       return;
     }
 
-    // Temporary notice about Firebase setup
-    toast('🔧 Mode temporaire activé: Firebase Firestore en cours d\'activation', {
-      duration: 3000,
-      icon: '⚠️'
-    });
-
     setIsSubmitting(true);
 
     try {
       const result = await userService.register(formData, photoFile);
       
       if (result.success) {
-        toast.success('Registration successful! Welcome to the battle!');
+        if (result.data?.firebaseConnected) {
+          toast.success('✅ Registration successful with Firebase! Welcome to the battle!');
+        } else {
+          toast.success('Registration successful! Welcome to the battle!');
+          if (!result.data?.firebaseConnected) {
+            toast('🔧 Données sauvegardées localement - Firebase sera connecté bientôt', {
+              duration: 3000,
+              icon: 'ℹ️'
+            });
+          }
+        }
         setTimeout(() => {
           navigate('/participants');
         }, 2000);

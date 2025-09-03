@@ -40,20 +40,60 @@ const Login = () => {
           setError('Code administrateur incorrect');
         }
       } else {
-        // Mode utilisateur - accepter temporairement n'importe quel nom
-        // (En attendant que Firebase Firestore soit activé)
-        if (formData.name.trim().length >= 2) {
-          toast('🔧 Mode temporaire: Connexion sans vérification Firebase', {
-            duration: 3000,
-            icon: '⚠️'
-          });
-          
-          // Créer un ID temporaire
-          const tempUserId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-          login('user', formData.name.trim(), tempUserId);
-          navigate('/');
-        } else {
-          setError('Le nom doit contenir au moins 2 caractères');
+        // Mode utilisateur - vérifier si le nom existe dans Firebase/base de données
+        try {
+          const response = await fetch('/api/users');
+          const result = await response.json();
+
+          if (result.success && result.data) {
+            const existingUser = result.data.find(
+              user => user.name.toLowerCase() === formData.name.toLowerCase()
+            );
+
+            if (existingUser) {
+              if (result.firebaseConnected) {
+                toast.success('✅ Connexion avec Firebase réussie !');
+              } else {
+                toast('🔧 Connexion en mode fallback (Firebase sera connecté bientôt)', {
+                  duration: 3000,
+                  icon: '⚠️'
+                });
+              }
+              login('user', existingUser.name, existingUser.id);
+              navigate('/');
+            } else {
+              // Si l'utilisateur n'existe pas, accepter quand même temporairement
+              if (formData.name.trim().length >= 2) {
+                toast('🔧 Nouveau utilisateur - mode temporaire activé', {
+                  duration: 3000,
+                  icon: '⚠️'
+                });
+                
+                const tempUserId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                login('user', formData.name.trim(), tempUserId);
+                navigate('/');
+              } else {
+                setError('Le nom doit contenir au moins 2 caractères');
+              }
+            }
+          } else {
+            setError('Erreur lors de la vérification. Veuillez réessayer.');
+          }
+        } catch (fetchError) {
+          console.error('Login fetch error:', fetchError);
+          // Fallback en cas d'erreur API
+          if (formData.name.trim().length >= 2) {
+            toast('🔧 Mode offline - connexion temporaire', {
+              duration: 3000,
+              icon: '⚠️'
+            });
+            
+            const tempUserId = `offline_${Date.now()}`;
+            login('user', formData.name.trim(), tempUserId);
+            navigate('/');
+          } else {
+            setError('Erreur de connexion. Nom minimum 2 caractères.');
+          }
         }
       }
     } catch (error) {
