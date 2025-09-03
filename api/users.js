@@ -1,17 +1,6 @@
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Admin-Token');
+// api/users.js - Netlify Function format
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method === 'GET') {
-    // Return participants data
-    const participants = [
+const participants = [
       {
         id: 'user_1',
         name: 'Alice Martin',
@@ -69,17 +58,43 @@ export default async function handler(req, res) {
       }
     ];
 
-    return res.status(200).json({
-      success: true,
-      message: 'Participants retrieved successfully',
-      data: participants,
-      total: participants.length,
-      timestamp: new Date().toISOString()
-    });
+export const handler = async (event, context) => {
+  // CORS headers for Netlify
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Token',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
+  };
+
+  // Handle pre-flight CORS request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204, // No Content
+      headers
+    };
   }
 
-  return res.status(405).json({
-    success: false,
-    message: 'Method not allowed'
-  });
-}
+  if (event.httpMethod === 'GET') {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: 'Participants retrieved successfully',
+        data: participants,
+        total: participants.length,
+        timestamp: new Date().toISOString()
+      })
+    };
+  }
+
+  return {
+    statusCode: 405,
+    headers,
+    body: JSON.stringify({
+      success: false,
+      message: `Method ${event.httpMethod} not allowed`
+    })
+  };
+};
+
