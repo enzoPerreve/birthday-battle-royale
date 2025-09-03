@@ -1,18 +1,12 @@
-# Fichier de configuration pour Netlify
+# Fichier de configuration pour Netlify pour un projet Next.js
 
 [build]
-  # Commande pour construire le site. Vercel détecte `npm run build` par défaut.
+  # La commande pour construire un projet Next.js est la même
   command = "npm run build"
-  
-  # Dossier qui contient le site buildé. Pour Create React App, c'est 'build'.
-  # Pour Next.js, ce serait '.next'.
-  publish = "build"
-  
-  # Dossier où se trouvent les fonctions serverless (API).
-  functions = "api"
+  # Le dossier de sortie pour Next.js est ".next"
+  publish = ".next"
 
-# Redirection pour que les appels /api/* fonctionnent comme sur Vercel.
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+# Plugin essentiel pour faire fonctionner Next.js sur Netlify
+# Il gère les fonctions API, le rendu côté serveur, etc.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
