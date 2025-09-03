@@ -11,6 +11,7 @@ import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
 import DebugAPI from './pages/DebugAPI';
 import APITester from './pages/APITester';
+import FirebaseTest from './pages/FirebaseTest';
 import './styles/App.css';
 
 // Composant pour protéger les routes qui nécessitent une authentification
@@ -93,6 +94,11 @@ function App() {
             <Route path="/api-test" element={
               <ProtectedRoute adminOnly={true}>
                 <APITester />
+              </ProtectedRoute>
+            } />
+            <Route path="/firebase-test" element={
+              <ProtectedRoute adminOnly={true}>
+                <FirebaseTest />
               </ProtectedRoute>
             } />
             
