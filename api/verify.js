@@ -1,36 +1,68 @@
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Admin-Token');
+// api/verify.js - Netlify Function format
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+export const handler = async (event, context) => {
+  // CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Token',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+  };
+
+  // Handle pre-flight CORS request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers
+    };
   }
 
-  if (req.method === 'POST') {
-    const { token } = req.body || {};
-    const adminToken = req.headers['x-admin-token'] || token;
+  if (event.httpMethod === 'POST') {
+    try {
+      const body = JSON.parse(event.body || '{}');
+      const tokenFromHeader = event.headers['x-admin-token'];
+      const adminToken = tokenFromHeader || body.token;
 
-    if (adminToken === 'Agathe0211/') {
-      return res.status(200).json({
-        success: true,
-        message: 'Admin access granted',
-        data: { isAdmin: true }
-      });
-    } else {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid admin token'
-      });
+      if (adminToken === 'Agathe0211/') {
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: true,
+            message: 'Admin access granted',
+            data: { isAdmin: true }
+          })
+        };
+      } else {
+        return {
+          statusCode: 401,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            message: 'Invalid admin token'
+          })
+        };
+      }
+    } catch (error) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Invalid request body'
+        })
+      };
     }
   }
 
   // GET method for endpoint status
-  return res.status(200).json({
-    success: true,
-    message: 'Admin verification endpoint is ready',
-    timestamp: new Date().toISOString()
-  });
-}
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      success: true,
+      message: 'Admin verification endpoint is ready',
+      timestamp: new Date().toISOString()
+    })
+  };
+};
+

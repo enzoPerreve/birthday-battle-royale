@@ -1,17 +1,25 @@
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Admin-Token');
+// api/register.js - Netlify Function format
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+export const handler = async (event, context) => {
+  // CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+  };
+
+  // Handle pre-flight CORS request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers
+    };
   }
 
-  if (req.method === 'POST') {
+  if (event.httpMethod === 'POST') {
     try {
-      const { name, contact, phrase } = req.body || {};
+      const body = JSON.parse(event.body || '{}');
+      const { name, contact, phrase } = body;
       
       const user = {
         id: Math.random().toString(36).substr(2, 9),
@@ -21,25 +29,38 @@ export default async function handler(req, res) {
         registeredAt: new Date().toISOString()
       };
 
-      return res.status(201).json({
-        success: true,
-        message: 'User registered successfully!',
-        data: user
-      });
+      return {
+        statusCode: 201,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          message: 'User registered successfully!',
+          data: user
+        })
+      };
     } catch (error) {
       console.error('Registration error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Registration failed',
-        error: error.message
-      });
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Registration failed',
+          error: error.message
+        })
+      };
     }
   }
 
-  // GET method
-  return res.status(200).json({
-    success: true,
-    message: 'Registration endpoint is ready',
-    timestamp: new Date().toISOString()
-  });
-}
+  // GET method for endpoint status
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      success: true,
+      message: 'Registration endpoint is ready',
+      timestamp: new Date().toISOString()
+    })
+  };
+};
+

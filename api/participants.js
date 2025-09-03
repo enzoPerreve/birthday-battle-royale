@@ -1,16 +1,6 @@
-export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Admin-Token');
+// api/participants.js - Netlify Function format
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method === 'GET') {
-    const mockUsers = [
+const mockUsers = [
       {
         id: 'user_1',
         name: 'Alice Martin',
@@ -46,16 +36,40 @@ export default async function handler(req, res) {
       }
     ];
 
-    return res.status(200).json({
-      success: true,
-      message: 'Participants retrieved successfully',
-      data: mockUsers,
-      total: mockUsers.length
-    });
+export const handler = async (event, context) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers
+    };
   }
 
-  return res.status(405).json({
-    success: false,
-    message: 'Method not allowed'
-  });
-}
+  if (event.httpMethod === 'GET') {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: 'Participants retrieved successfully',
+        data: mockUsers,
+        total: mockUsers.length
+      })
+    };
+  }
+
+  return {
+    statusCode: 405,
+    headers,
+    body: JSON.stringify({
+      success: false,
+      message: `Method ${event.httpMethod} not allowed`
+    })
+  };
+};
+
