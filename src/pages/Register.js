@@ -74,6 +74,12 @@ const Register = () => {
       return;
     }
 
+    // Temporary notice about Firebase setup
+    toast('🔧 Mode temporaire activé: Firebase Firestore en cours d\'activation', {
+      duration: 3000,
+      icon: '⚠️'
+    });
+
     setIsSubmitting(true);
 
     try {

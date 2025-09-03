@@ -1,6 +1,5 @@
-// api/register.js - Netlify Function format with Firebase
-import { db } from '../src/config/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+// api/register.js - Netlify Function format with local storage fallback
+// Temporary solution while Firebase Firestore is being activated
 
 export const handler = async (event, context) => {
   // CORS headers
@@ -31,28 +30,31 @@ export const handler = async (event, context) => {
         };
       }
       
+      // Create participant data (temporary local mode)
       const newUser = {
-        name: name,
-        contact: contact,
-        phrase: phrase || 'Ready to battle!',
-        registeredAt: serverTimestamp(), // Utilise l'heure du serveur Firebase
+        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: name.trim(),
+        contact: contact.trim(),
+        phrase: phrase?.trim() || 'Ready to battle!',
+        registeredAt: new Date().toISOString(),
         gamesPlayed: 0,
         gamesWon: 0,
         currentGameId: null,
         status: 'active',
-        lastActive: serverTimestamp()
+        lastActive: new Date().toISOString()
       };
 
-      // Ajoute le nouvel utilisateur à la collection "participants"
-      const docRef = await addDoc(collection(db, "participants"), newUser);
+      // Simulate successful registration (no Firebase for now)
+      console.log('Participant registered (local simulation):', newUser);
 
       return {
         statusCode: 201,
         headers,
         body: JSON.stringify({
           success: true,
-          message: 'User registered successfully!',
-          data: { id: docRef.id, ...newUser }
+          message: 'User registered successfully! (Temporary local mode)',
+          data: newUser,
+          note: 'Firebase Firestore will be connected soon for persistent storage'
         })
       };
     } catch (error) {
@@ -75,8 +77,9 @@ export const handler = async (event, context) => {
     headers,
     body: JSON.stringify({
       success: true,
-      message: 'Registration endpoint is ready',
-      timestamp: new Date().toISOString()
+      message: 'Registration endpoint is ready (local mode)',
+      timestamp: new Date().toISOString(),
+      note: 'Firestore integration pending activation'
     })
   };
 };
