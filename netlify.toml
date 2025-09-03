@@ -1,12 +1,19 @@
-# Fichier de configuration pour Netlify pour un projet Next.js
+# Fichier de configuration pour Netlify pour un projet Create React App
 
 [build]
-  # La commande pour construire un projet Next.js est la même
+  # Commande pour construire le site pour Create React App
   command = "npm run build"
-  # Le dossier de sortie pour Next.js est ".next"
-  publish = ".next"
+  
+  # Dossier qui contient le site buildé. Pour Create React App, c'est 'build'.
+  publish = "build"
+  
+  # Dossier où se trouvent les fonctions serverless (API).
+  # Netlify les trouvera automatiquement ici.
+  functions = "api"
 
-# Plugin essentiel pour faire fonctionner Next.js sur Netlify
-# Il gère les fonctions API, le rendu côté serveur, etc.
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+# Redirection pour que les appels /api/* pointent vers les fonctions serverless.
+# C'est crucial pour que le backend fonctionne.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
